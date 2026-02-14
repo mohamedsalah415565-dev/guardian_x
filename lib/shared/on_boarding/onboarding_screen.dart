@@ -4,7 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:guardian_x/bloc/bloc_bloc.dart';
 import 'package:guardian_x/bloc/bloc_event.dart';
 import 'package:guardian_x/bloc/bloc_state.dart';
-import 'package:guardian_x/home_screen.dart';
+import 'package:guardian_x/auth/login_screen.dart';
 import 'package:guardian_x/shared/colors/app_color.dart';
 import 'package:guardian_x/shared/on_boarding/onboarding_model.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -44,7 +44,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         if (state is OnboardingCompleted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
           );
         }
       },
@@ -58,9 +58,7 @@ class _OnboardingViewState extends State<OnboardingView> {
 
           if (state is OnboardingError) {
             return Scaffold(
-              body: Center(
-                child: Text('Error: ${state.message}'),
-              ),
+              body: Center(child: Text('Error: ${state.message}')),
             );
           }
 
@@ -118,7 +116,9 @@ class _OnboardingViewState extends State<OnboardingView> {
             // Animated Ok button
             AnimatedSlide(
               duration: const Duration(milliseconds: 500),
-              offset: state.isLastPage ? const Offset(0, 0) : const Offset(0, 1),
+              offset: state.isLastPage
+                  ? const Offset(0, 0)
+                  : const Offset(0, 1),
               curve: Curves.easeOut,
               child: AnimatedOpacity(
                 duration: const Duration(milliseconds: 500),
@@ -137,10 +137,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                   },
                   child: const Text(
                     'Ok',
-                    style: TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w400,
-                    ),
+                    style: TextStyle(fontSize: 19, fontWeight: FontWeight.w400),
                   ),
                 ),
               ),

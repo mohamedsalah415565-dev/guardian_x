@@ -40,6 +40,13 @@ dependencies:
   shared_preferences: ^2.5.3
   smooth_page_indicator: ^1.2.1
   gap: ^3.0.1
+  # fire base
+  firebase_auth: ^6.1.4
+  firebase_core: ^4.4.0
+  cloud_firestore: ^6.1.2
+  firebase_storage: ^13.0.6
+  firebase_messaging: ^16.1.1
+  google_sign_in: ^7.2.0
 
 dev_dependencies:
   flutter_test:
