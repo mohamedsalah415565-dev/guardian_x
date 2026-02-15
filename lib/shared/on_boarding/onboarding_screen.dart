@@ -4,8 +4,8 @@ import 'package:gap/gap.dart';
 import 'package:guardian_x/bloc/bloc_bloc.dart';
 import 'package:guardian_x/bloc/bloc_event.dart';
 import 'package:guardian_x/bloc/bloc_state.dart';
-import 'package:guardian_x/auth/login_screen.dart';
-import 'package:guardian_x/shared/colors/app_color.dart';
+import 'package:guardian_x/shared/auth/screens/login_screen.dart';
+import 'package:guardian_x/shared/colors/app_theme.dart';
 import 'package:guardian_x/shared/on_boarding/onboarding_model.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -44,7 +44,7 @@ class _OnboardingViewState extends State<OnboardingView> {
         if (state is OnboardingCompleted) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
+            MaterialPageRoute(builder: (context) => LoginScreen()),
           );
         }
       },
@@ -77,9 +77,9 @@ class _OnboardingViewState extends State<OnboardingView> {
     OnboardingInProgress state,
   ) {
     return Scaffold(
-      backgroundColor: AppColor.white,
+      backgroundColor: AppTheme.white,
       appBar: AppBar(
-        backgroundColor: AppColor.white,
+        backgroundColor: AppTheme.white,
         elevation: 0,
         actions: [
           TextButton(
