@@ -27,13 +27,13 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          physics: BouncingScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
               // 1. Top Illustration
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 22),
+                padding: EdgeInsets.symmetric(vertical: 22),
                 child: Image.asset(
                   'assets/images/login_image.png',
                   height: screenHeight * 0.25,
@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 passwordController: passwordController,
                 formKey: formKey,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // 3. Primary Login Button
               _isLoading
@@ -57,30 +57,36 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         if (formKey.currentState!.validate()) {
                           setState(() => _isLoading = true);
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/home',
+                            (route) => false,
+                          );
+
                           // Firebase login logic here
                         }
                       },
                     ),
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
 
               // 4. Social Divider
               Row(
                 children: [
-                  const Expanded(child: Divider(thickness: 1.2)),
+                  Expanded(child: Divider(thickness: 1.2)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text('OR', style: theme.textTheme.bodyMedium),
                   ),
-                  const Expanded(child: Divider(thickness: 1.2)),
+                  Expanded(child: Divider(thickness: 1.2)),
                 ],
               ),
 
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
 
               // 5. Google Login Button
               LoginGoogleButton(onTap: () {}),
 
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
 
               // 6. Footer: Register Link
               Row(
@@ -95,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   TextButton(
                     onPressed: () => Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                      MaterialPageRoute(builder: (_) => RegisterScreen()),
                     ),
                     child: Text(
                       'Register',
