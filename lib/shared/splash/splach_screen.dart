@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:guardian_x/home_screen.dart';
+import 'package:guardian_x/shared/auth/screens/login_screen.dart';
 
 import 'package:guardian_x/shared/on_boarding/onboarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -75,8 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  completed ? const HomeScreen() : const OnBording(),
+              builder: (_) => completed ? LoginScreen() : const OnBording(),
             ),
           );
         });
