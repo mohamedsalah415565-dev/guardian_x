@@ -1,5 +1,7 @@
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:guardian_x/home_screen.dart';
+import 'package:guardian_x/shared/auth/screens/add_profile_screen.dart';
 import 'package:guardian_x/shared/auth/screens/register_screen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,11 +26,16 @@ void main() async {
   runApp(MyApp(onboardingCompleted: onboardingCompleted));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final bool onboardingCompleted;
 
   const MyApp({super.key, required this.onboardingCompleted});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -38,13 +45,14 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
 
       /// First screen
-      home: SplashScreen(goToHomeDirectly: onboardingCompleted),
+      home: SplashScreen(goToHomeDirectly: widget.onboardingCompleted),
 
       /// App routes
       routes: {
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
+        LoginScreen.routeName: (context) => LoginScreen(),
+        RegisterScreen.routeName: (context) => RegisterScreen(),
+        AddProfileScreen.routeName: (context) => AddProfileScreen(),
+        HomeScreen.routeName: (context) => HomeScreen(),
       },
     );
   }
