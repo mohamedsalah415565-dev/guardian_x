@@ -1,5 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:guardian_x/shared/auth/services/auth_service.dart';
+import 'package:guardian_x/shared/colors/app_theme.dart';
 import 'package:guardian_x/shared/widgets/custome_text_form_feild.dart';
 
 class LoginForm extends StatefulWidget {
@@ -23,16 +24,18 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = AppTheme.lightTheme;
+
     return Form(
       key: widget.formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Email",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
+          /// Email label
+          Text("Email", style: theme.textTheme.bodyMedium),
           const SizedBox(height: 10),
+
+          /// Email input
           CustomTextField(
             controller: widget.emailController,
             hint: "Enter your email",
@@ -41,13 +44,13 @@ class _LoginFormState extends State<LoginForm> {
                 ? "Enter a valid email"
                 : null,
           ),
+          const SizedBox(height: 20),
+
+          /// Password label
+          Text("Password", style: theme.textTheme.bodyMedium),
           const SizedBox(height: 10),
 
-          const Text(
-            "Password",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-          ),
-          const SizedBox(height: 10),
+          /// Password input with toggle
           CustomTextField(
             controller: widget.passwordController,
             hint: "Enter your password",
@@ -64,47 +67,44 @@ class _LoginFormState extends State<LoginForm> {
                 ? "Password too short"
                 : null,
           ),
+          SizedBox(height: 16),
 
-          /// Forgot password button
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () async {
-                  if (widget.emailController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Enter your email first")),
-                    );
-                    return;
-                  }
+          /// Forgot password
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () async {
+                final email = widget.emailController.text.trim();
+                if (email.isEmpty) {
+                  if (!mounted) return; // Guard State usage
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Enter your email first")),
+                  );
+                  return;
+                }
 
-                  try {
-                    // الـ Async Gap بتبدأ هنا
-                    await AuthService.resetPassword(
-                      widget.emailController.text.trim(),
-                    );
+                // Capture scaffold context before async gap
+                final scaffold = ScaffoldMessenger.of(context);
 
-                    // التشيك السليم على الـ context
-                    if (!context.mounted) return;
+                try {
+                  await FirebaseAuth.instance.sendPasswordResetEmail(
+                    email: email,
+                  );
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Reset email sent")),
-                    );
-                  } catch (e) {
-                    if (!context.mounted) return;
-
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(e.toString())));
-                  }
-                },
-                child: const Text(
-                  "Forgot Password?",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  if (!mounted) return; // Guard after async
+                  scaffold.showSnackBar(
+                    const SnackBar(content: Text("Password reset email sent")),
+                  );
+                } catch (e) {
+                  if (!mounted) return; // Guard after async
+                  scaffold.showSnackBar(SnackBar(content: Text(e.toString())));
+                }
+              },
+              child: Text(
+                "Forgot Password?",
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppTheme.red,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
