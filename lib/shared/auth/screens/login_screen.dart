@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:guardian_x/shared/auth/screens/login_form.dart';
+import 'package:guardian_x/home_screen.dart';
+import 'package:guardian_x/shared/widgets/login_form.dart';
 import 'package:guardian_x/shared/auth/screens/register_screen.dart';
+import 'package:guardian_x/shared/auth/services/auth_service.dart';
 import 'package:guardian_x/shared/colors/app_theme.dart';
 import 'package:guardian_x/shared/widgets/custom_elevated_button.dart';
 import 'package:guardian_x/shared/widgets/google_login_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+  static const String routeName = '/LoginScreen';
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -19,6 +22,30 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleGoogleSignIn() async {
+    final scaffold = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+
+    try {
+      final result = await AuthService.signInWithGoogle();
+
+      if (!mounted) return;
+
+      if (result.isNotEmpty) {
+        navigator.pushNamedAndRemoveUntil(HomeScreen.routeName, (_) => false);
+      }
+    } catch (e) {
+      scaffold.showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final theme = Theme.of(context);
@@ -27,13 +54,13 @@ class _LoginScreenState extends State<LoginScreen> {
       backgroundColor: AppTheme.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 24),
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             children: [
-              // 1. Top Illustration
+              // Top Illustration
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 22),
+                padding: const EdgeInsets.symmetric(vertical: 22),
                 child: Image.asset(
                   'assets/images/login_image.png',
                   height: screenHeight * 0.25,
@@ -41,54 +68,78 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              // 2. The Input Form (Email & Password)
+              // Login Form
               LoginForm(
                 emailController: emailController,
                 passwordController: passwordController,
                 formKey: formKey,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-              // 3. Primary Login Button
-              _isLoading
-                  ? CircularProgressIndicator(color: AppTheme.primary)
-                  : CustomButton(
-                      text: 'Login',
-                      onPressed: () {
-                        if (formKey.currentState!.validate()) {
-                          setState(() => _isLoading = true);
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            '/home',
-                            (route) => false,
-                          );
+              // Login Button
+              CustomButton(
+                text: 'Login',
+                isLoading: _isLoading,
+                onPressed: () async {
+                  if (!formKey.currentState!.validate()) return;
 
-                          // Firebase login logic here
-                        }
-                      },
-                    ),
-              SizedBox(height: 22),
+                  setState(() => _isLoading = true);
 
-              // 4. Social Divider
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  final navigator = Navigator.of(context);
+
+                  try {
+                    await AuthService.login(
+                      email: emailController.text.trim(),
+                      password: passwordController.text.trim(),
+                    );
+
+                    if (!mounted) return;
+
+                    navigator.pushNamedAndRemoveUntil(
+                      HomeScreen.routeName,
+                      (_) => false,
+                    );
+                  } catch (e) {
+                    if (!mounted) return;
+
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString()),
+                        backgroundColor: AppTheme.red,
+                      ),
+                    );
+                  }
+
+                  if (mounted) setState(() => _isLoading = false);
+                },
+              ),
+
+              const SizedBox(height: 22),
+
+              // OR divider
               Row(
                 children: [
-                  Expanded(child: Divider(thickness: 1.2)),
+                  const Expanded(child: Divider(thickness: 1.2)),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text('OR', style: theme.textTheme.bodyMedium),
                   ),
-                  Expanded(child: Divider(thickness: 1.2)),
+                  const Expanded(child: Divider(thickness: 1.2)),
                 ],
               ),
 
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-              // 5. Google Login Button
-              LoginGoogleButton(onTap: () {}),
+              // Google Sign-In
+              LoginGoogleButton(
+                // Wrap async function in a synchronous closure
+                onTap: () => _handleGoogleSignIn(),
+              ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-              // 6. Footer: Register Link
+              // Footer: Register link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -99,9 +150,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () => Navigator.push(
+                    onPressed: () => Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => RegisterScreen()),
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
                     ),
                     child: Text(
                       'Register',
